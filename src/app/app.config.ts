@@ -7,6 +7,7 @@ import {
 
 import { routes } from './app.routes';
 import {provideAnimations} from '@angular/platform-browser/animations';
+import {provideHttpClient} from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -34,5 +35,7 @@ export const appConfig: ApplicationConfig = {
     // 4) Если планируешь Angular-анимации (или UI-библиотеку, что их требует) — оставь.
     //    Для Tailwind/daisyUI не обязательно.
     // provideAnimations(),
+
+    provideHttpClient(),
   ],
 };
