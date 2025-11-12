@@ -1,3 +1,25 @@
-<h1 class="text-2xl font-bold mb-4">Projects</h1>
-<p class="opacity-70">Список проектов появится здесь.</p>
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">Projects</h1>
+  <button class="btn btn-primary"
+          (click)="create()">New project
+  </button>
+</div>
 
+<ul class="menu bg-base-200 rounded-box">
+  @for (p of store.projects(); track p.id) {
+    <li class="flex items-center">
+      <a (click)="select(p.id)"
+         [class.active]="store.selected()?.id === p.id">
+        {{ p.name }}
+      </a>
+      <div class="ml-auto flex gap-2">
+        <button class="btn btn-xs"
+                (click)="rename(p.id, p.name)">Rename
+        </button>
+        <button class="btn btn-xs btn-error"
+                (click)="remove(p.id)">Delete
+        </button>
+      </div>
+    </li>
+  }
+</ul>
