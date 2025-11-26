@@ -1,11 +1,12 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {ProjectsStore} from '../../../../state/projects.store';
+import {RouterLink, RouterLinkActive} from '@angular/router';
 
 @Component({
   selector: 'app-projects-list',
+  imports: [RouterLink, RouterLinkActive],
   templateUrl: './projects-list.component.html',
   styleUrl: './projects-list.component.css',
-  providers: [ProjectsStore],
 })
 export class ProjectsListComponent implements OnInit {
   readonly store = inject(ProjectsStore);

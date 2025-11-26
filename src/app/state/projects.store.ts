@@ -1,8 +1,9 @@
-import { computed, inject, signal } from '@angular/core';
+import {computed, inject, Injectable, signal} from '@angular/core';
 import { ProjectsRepository } from '../data-access/projects.repository';
 import { Project } from '../data-access/models';
 import { firstValueFrom } from 'rxjs';
 
+@Injectable({ providedIn: 'root' })
 export class ProjectsStore {
   private repo = inject(ProjectsRepository);
 

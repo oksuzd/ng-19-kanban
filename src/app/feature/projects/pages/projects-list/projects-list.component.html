@@ -8,8 +8,11 @@
 <ul class="menu bg-base-200 rounded-box">
   @for (p of store.projects(); track p.id) {
     <li class="flex items-center">
-      <a (click)="select(p.id)"
-         [class.active]="store.selected()?.id === p.id">
+      <a
+        (click)="select(p.id)"
+        [routerLink]="['/project', p.id]"
+        routerLinkActive="active"
+      >
         {{ p.name }}
       </a>
       <div class="ml-auto flex gap-2">

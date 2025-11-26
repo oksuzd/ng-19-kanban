@@ -31,6 +31,7 @@ export class ProjectDetailsComponent implements OnInit {
 
     this.projectId = id;
     this.projectsStore.selectedId.set(id);
+    void this.projectsStore.refresh();
     void this.boardsStore.load(id);
   }
 
