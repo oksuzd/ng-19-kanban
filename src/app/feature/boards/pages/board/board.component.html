@@ -1,15 +1,49 @@
 <nav class="text-sm mb-4">
   <a routerLink="/projects" class="underline">Projects</a>
   <span class="opacity-60"> / </span>
-
-  <a [routerLink]="['/project', projectId]" class="underline">Project</a>
+  <a class="underline" (click)="backToProject()">
+    {{ projectsStore.selected()?.name || 'Project' }}
+  </a>
   <span class="opacity-60"> / </span>
-
+<!--  TODO реальное имя доски-->
   <span>Board</span>
 </nav>
 
-<h1 class="text-2xl font-bold mb-2">Board</h1>
+@if (boardStore.columns().length === 0) {
+  <p class="opacity-70">No columns yet.</p>
+} @else {
+  <div class="flex gap-4 items-start overflow-x-auto">
+    @for (col of boardStore.columns(); track col.id) {
+      <div class="bg-base-200 rounded-box p-3 min-w-[260px]">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="font-semibold">{{ col.name }}</h2>
+          <button class="btn btn-xs btn-primary" (click)="addCard(col.id)">+</button>
+        </div>
 
-<p class="text-gray-500">
-  Колонки и карточки будут здесь.
-</p>
+        <div class="space-y-2">
+          @for (card of boardStore.cardsByColumn()[col.id] ?? []; track card.id) {
+            <article class="card bg-base-100 shadow-sm">
+              <div class="card-body p-3">
+                <div class="flex justify-between items-start gap-2">
+                  <h3 class="font-medium text-sm">
+                    {{ card.title }}
+                  </h3>
+                  <div class="flex gap-1">
+                    <button class="btn btn-xs" (click)="editCard(card.id, card.title, card.description)">Edit</button>
+                    <button class="btn btn-xs btn-error" (click)="deleteCard(card.id)">✕</button>
+                  </div>
+                </div>
+
+                @if (card.description) {
+                  <p class="text-xs opacity-80 mt-1">
+                    {{ card.description }}
+                  </p>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}
