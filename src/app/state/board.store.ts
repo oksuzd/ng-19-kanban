@@ -32,8 +32,8 @@ export class BoardStore {
     this.cards.set(cards);
   }
 
-  async createCard(boardId: number, columnId: number, title: string) {
-    await firstValueFrom(this.cardsRepo.create(boardId, columnId, title));
+  async createCard(boardId: number, columnId: number, title: string, description: string) {
+    await firstValueFrom(this.cardsRepo.create(boardId, columnId, title, description));
     await this.load(boardId);
   }
 

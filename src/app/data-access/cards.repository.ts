@@ -13,13 +13,13 @@ export class CardsRepository {
     return this.http.get<Card[]>(`${API}/cards?boardId=${boardId}&_sort=order&_order=asc`);
   }
 
-  create(boardId: number, columnId: number, title: string) {
+  create(boardId: number, columnId: number, title: string, description: string) {
     const now = new Date().toISOString();
     const body: Omit<Card, 'id'> = {
       boardId,
       columnId,
       title,
-      description: '',
+      description,
       assigneeId: null,
       priority: 'medium',
       tags: [],
@@ -29,6 +29,7 @@ export class CardsRepository {
     };
     return this.http.post<Card>(`${API}/cards`, body);
   }
+
 
   update(card: Partial<Card> & { id: number }) {
     return this.http.patch<Card>(`${API}/cards/${card.id}`, {

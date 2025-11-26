@@ -5,7 +5,6 @@
     {{ projectsStore.selected()?.name || 'Project' }}
   </a>
   <span class="opacity-60"> / </span>
-<!--  TODO реальное имя доски-->
   <span>Board</span>
 </nav>
 
@@ -16,8 +15,14 @@
     @for (col of boardStore.columns(); track col.id) {
       <div class="bg-base-200 rounded-box p-3 min-w-[260px]">
         <div class="flex items-center justify-between mb-2">
-          <h2 class="font-semibold">{{ col.name }}</h2>
-          <button class="btn btn-xs btn-primary" (click)="addCard(col.id)">+</button>
+          <h2 class="font-semibold text-sm">{{ col.name }}</h2>
+          <button
+            type="button"
+            class="btn btn-xs btn-primary"
+            (click)="openCreateCardModal(col.id)"
+          >
+            +
+          </button>
         </div>
 
         <div class="space-y-2">
@@ -28,9 +33,22 @@
                   <h3 class="font-medium text-sm">
                     {{ card.title }}
                   </h3>
+
                   <div class="flex gap-1">
-                    <button class="btn btn-xs" (click)="editCard(card.id, card.title, card.description)">Edit</button>
-                    <button class="btn btn-xs btn-error" (click)="deleteCard(card.id)">✕</button>
+                    <button
+                      type="button"
+                      class="btn btn-xs"
+                      (click)="openEditCardModal(card)"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-xs btn-error"
+                      (click)="deleteCard(card.id)"
+                    >
+                      ✕
+                    </button>
                   </div>
                 </div>
 
@@ -47,3 +65,51 @@
     }
   </div>
 }
+
+@if (isCardModalOpen()) {
+  <div class="modal modal-open">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">
+        {{ cardModalTitle() }}
+      </h3>
+
+      <form [formGroup]="cardForm" (ngSubmit)="submitCardForm()" class="space-y-4">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Title</span>
+          </label>
+          <input
+            type="text"
+            class="input input-bordered w-full"
+            formControlName="title"
+            [class.input-error]="cardForm.controls.title.invalid && cardForm.controls.title.touched"
+          />
+          @if (cardForm.controls.title.invalid && cardForm.controls.title.touched) {
+            <p class="text-xs text-error mt-1">Title is required</p>
+          }
+        </div>
+
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Description</span>
+          </label>
+          <textarea
+            class="textarea textarea-bordered w-full"
+            rows="3"
+            formControlName="description"
+          ></textarea>
+        </div>
+
+        <div class="modal-action">
+          <button type="button" class="btn btn-ghost" (click)="closeCardModal()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="cardForm.invalid">
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+

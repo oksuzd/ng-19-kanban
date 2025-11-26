@@ -1,14 +1,14 @@
 {
   "projects": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Demo Project",
       "createdAt": "2025-01-01T09:00:00Z"
     }
   ],
   "boards": [
     {
-      "id": 1,
+      "id": "1",
       "projectId": 1,
       "name": "Main board",
       "order": 1
@@ -16,21 +16,21 @@
   ],
   "columns": [
     {
-      "id": 1,
+      "id": "1",
       "boardId": 1,
       "name": "To Do",
       "order": 1,
       "wipLimit": 5
     },
     {
-      "id": 2,
+      "id": "2",
       "boardId": 1,
       "name": "In Progress",
       "order": 2,
       "wipLimit": 3
     },
     {
-      "id": 3,
+      "id": "3",
       "boardId": 1,
       "name": "Done",
       "order": 3,
@@ -39,7 +39,7 @@
   ],
   "cards": [
     {
-      "id": 1,
+      "id": "1",
       "boardId": 1,
       "columnId": 1,
       "title": "Set up project structure",
@@ -54,7 +54,7 @@
       "updatedAt": "2025-01-02T10:00:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "boardId": 1,
       "columnId": 2,
       "title": "Implement Projects list",
@@ -67,15 +67,28 @@
       "order": 1,
       "createdAt": "2025-01-03T09:00:00Z",
       "updatedAt": "2025-01-03T09:00:00Z"
+    },
+    {
+      "id": "6d7c",
+      "boardId": 1,
+      "columnId": "2",
+      "title": "1234",
+      "description": "werwtwt",
+      "assigneeId": null,
+      "priority": "medium",
+      "tags": [],
+      "order": 1764172963995,
+      "createdAt": "2025-11-26T16:02:43.995Z",
+      "updatedAt": "2025-11-26T16:37:25.721Z"
     }
   ],
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Alex"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Sam"
     }
   ]

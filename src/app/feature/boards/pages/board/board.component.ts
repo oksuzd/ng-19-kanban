@@ -2,30 +2,46 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
-  inject
+  inject, signal, computed
 } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BoardStore } from '../../../../state/board.store';
 import { ProjectsStore } from '../../../../state/projects.store';
+import { Card } from '../../../../data-access/models';
 
 @Component({
   selector: 'app-board',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, ReactiveFormsModule],
   templateUrl: './board.component.html',
   styleUrl: './board.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [BoardStore]
+  providers: [BoardStore],
 })
 export class BoardComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
 
   readonly boardStore = inject(BoardStore);
   readonly projectsStore = inject(ProjectsStore);
 
   projectId!: number;
   boardId!: number;
+
+  readonly isCardModalOpen = signal(false);
+  readonly editingCard = signal<Card | null>(null);
+  readonly currentColumnId = signal<number | null>(null);
+
+  readonly cardModalTitle = computed(() =>
+    this.editingCard() ? 'Edit card' : 'New card'
+  );
+
+  readonly cardForm = this.fb.nonNullable.group({
+    title: ['', [Validators.required, Validators.maxLength(200)]],
+    description: [''],
+  });
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -39,26 +55,48 @@ export class BoardComponent implements OnInit {
     });
   }
 
-  async addCard(columnId: number) {
-    const title = prompt('Card title?');
-    if (title?.trim()) {
-      await this.boardStore.createCard(this.boardId, columnId, title.trim());
-    }
+  openCreateCardModal(columnId: number) {
+    this.editingCard.set(null);
+    this.currentColumnId.set(columnId);
+    this.cardForm.reset({
+      title: '',
+      description: '',
+    });
+    this.isCardModalOpen.set(true);
   }
 
-  async editCard(cardId: number,
-                 currentTitle: string | undefined,
-                 currentDescription: string | undefined) {
-    const title = prompt('New title:', currentTitle ?? '');
-    if (!title) return;
-
-    const description = prompt('Description:', currentDescription ?? '') ?? '';
-
-    await this.boardStore.updateCard(this.boardId, {
-      id: cardId,
-      title: title.trim(),
-      description: description.trim(),
+  openEditCardModal(card: Card) {
+    this.editingCard.set(card);
+    this.currentColumnId.set(card.columnId);
+    this.cardForm.reset({
+      title: card.title ?? '',
+      description: card.description ?? '',
     });
+    this.isCardModalOpen.set(true);
+  }
+
+  closeCardModal() {
+    this.isCardModalOpen.set(false);
+  }
+
+  async submitCardForm() {
+    if (this.cardForm.invalid || this.currentColumnId() == null) return;
+
+    const { title, description } = this.cardForm.getRawValue();
+    const columnId = this.currentColumnId()!;
+
+    if (!this.editingCard()) {
+      await this.boardStore.createCard(this.boardId, columnId, title.trim(), description.trim());
+    } else {
+      await this.boardStore.updateCard(this.boardId, {
+        id: this.editingCard()!.id,
+        title: title.trim(),
+        description: description.trim(),
+        columnId,
+      });
+    }
+
+    this.isCardModalOpen.set(false);
   }
 
   async deleteCard(cardId: number) {
