@@ -4,13 +4,14 @@ import {
   OnInit,
   inject
 } from '@angular/core';
-import {ActivatedRoute, Router } from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {BoardsStore} from '../../../../state/boards.store';
 import {ProjectsStore} from '../../../../state/projects.store';
 
 @Component({
   selector: 'app-project-details',
   standalone: true,
+  imports: [RouterLink],
   templateUrl: './project-details.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [BoardsStore]

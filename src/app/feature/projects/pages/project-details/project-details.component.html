@@ -1,3 +1,9 @@
+<nav class="text-sm mb-4">
+  <a routerLink="/projects" class="underline">Projects</a>
+  <span class="opacity-60"> / </span>
+  <span>{{ projectsStore.selected()?.name || 'Project' }}</span>
+</nav>
+
 <div class="flex items-center justify-between mb-4">
   <h1 class="text-2xl font-bold">
     {{ projectsStore.selected()?.name || 'Project' }}
