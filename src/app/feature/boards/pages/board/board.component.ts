@@ -9,11 +9,14 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BoardStore } from '../../../../state/board.store';
 import { ProjectsStore } from '../../../../state/projects.store';
 import { Card } from '../../../../data-access/models';
+import {
+  ConfirmDialogComponent
+} from '../../../../shared/ui/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-board',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, ReactiveFormsModule, ReactiveFormsModule, ConfirmDialogComponent],
   templateUrl: './board.component.html',
   styleUrl: './board.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,6 +45,9 @@ export class BoardComponent implements OnInit {
     title: ['', [Validators.required, Validators.maxLength(200)]],
     description: [''],
   });
+
+  readonly isDeleteCardDialogOpen = signal(false);
+  readonly cardIdToDelete = signal<number | null>(null);
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
@@ -99,13 +105,29 @@ export class BoardComponent implements OnInit {
     this.isCardModalOpen.set(false);
   }
 
-  async deleteCard(cardId: number) {
-    if (!confirm('Delete card?')) return;
-    await this.boardStore.deleteCard(this.boardId, cardId);
+  openDeleteCardDialog(cardId: number) {
+    this.cardIdToDelete.set(cardId);
+    this.isDeleteCardDialogOpen.set(true);
+  }
+
+  async confirmDeleteCard() {
+    const id = this.cardIdToDelete();
+    if (id == null) {
+      this.isDeleteCardDialogOpen.set(false);
+      return;
+    }
+
+    await this.boardStore.deleteCard(this.boardId, id);
+    this.isDeleteCardDialogOpen.set(false);
+    this.cardIdToDelete.set(null);
+  }
+
+  cancelDeleteCard() {
+    this.isDeleteCardDialogOpen.set(false);
+    this.cardIdToDelete.set(null);
   }
 
   backToProject() {
     void this.router.navigate(['/project', this.projectId]);
   }
 }
-

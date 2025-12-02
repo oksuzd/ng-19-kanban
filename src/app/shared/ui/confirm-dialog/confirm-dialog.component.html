@@ -1,0 +1,29 @@
+@if (open()) {
+  <div class="modal modal-open">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-3">
+        {{ title() }}
+      </h3>
+
+      <p class="py-2">
+        {{ message() }}
+      </p>
+
+      <div class="modal-action">
+        <button type="button" class="btn btn-ghost" (click)="onCancel()">
+          {{ cancelLabel() }}
+        </button>
+
+        <button
+          type="button"
+          class="btn"
+          [class.btn-error]="destructive()"
+          [class.btn-primary]="!destructive()"
+          (click)="onConfirm()"
+        >
+          {{ confirmLabel() }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
