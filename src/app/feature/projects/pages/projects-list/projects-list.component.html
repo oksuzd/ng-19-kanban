@@ -19,10 +19,28 @@
         <button class="btn btn-xs"
                 (click)="rename(p.id, p.name)">Rename
         </button>
-        <button class="btn btn-xs btn-error"
-                (click)="remove(p.id)">Delete
+
+        <button
+          class="btn btn-xs btn-error"
+          type="button"
+          (click)="openDeleteProjectDialog(p.id, p.name)"
+        >
+          Delete
         </button>
+
       </div>
     </li>
   }
 </ul>
+
+<app-confirm-dialog
+  [open]="isDeleteProjectDialogOpen()"
+  title="Delete project"
+  [message]="deleteProjectMessage()"
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
+  [destructive]="true"
+  (confirmed)="confirmDeleteProject()"
+  (cancelled)="cancelDeleteProject()"
+></app-confirm-dialog>
+

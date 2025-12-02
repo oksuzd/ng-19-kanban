@@ -36,7 +36,13 @@
 
       <div class="ml-auto flex gap-2">
         <button class="btn btn-xs" (click)="renameBoard(b.id, b.name)">Rename</button>
-        <button class="btn btn-xs btn-error" (click)="removeBoard(b.id)">Delete</button>
+        <button
+          type="button"
+          class="btn btn-xs btn-error"
+          (click)="openDeleteBoardDialog(b)"
+        >
+          Delete
+        </button>
       </div>
     </li>
   }
@@ -47,3 +53,14 @@
     No boards yet. Create the first one!
   </p>
 }
+
+<app-confirm-dialog
+  [open]="isDeleteBoardDialogOpen()"
+  title="Delete board"
+  [message]="deleteBoardMessage()"
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
+  [destructive]="true"
+  (confirmed)="confirmDeleteBoard()"
+  (cancelled)="cancelDeleteBoard()"
+></app-confirm-dialog>
