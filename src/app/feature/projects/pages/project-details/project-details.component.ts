@@ -11,20 +11,24 @@ import {
   ConfirmDialogComponent
 } from '../../../../shared/ui/confirm-dialog/confirm-dialog.component';
 import { Board } from '../../../../data-access/models';
+import {
+  NameDialogComponent
+} from '../../../../shared/ui/name-dialog/name-dialog.component';
 
 @Component({
   selector: 'app-project-details',
   standalone: true,
-  imports: [RouterLink, ConfirmDialogComponent],
+  imports: [RouterLink, ConfirmDialogComponent, NameDialogComponent],
   templateUrl: './project-details.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [BoardsStore]
 })
 export class ProjectDetailsComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  boardsStore = inject(BoardsStore);
-  projectsStore = inject(ProjectsStore);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+
+  readonly boardsStore = inject(BoardsStore);
+  readonly projectsStore = inject(ProjectsStore);
 
   projectId!: number;
 
@@ -37,31 +41,60 @@ export class ProjectDetailsComponent implements OnInit {
     return name ? `Delete board "${name}"?` : 'Delete this board?';
   });
 
+  readonly isBoardNameDialogOpen = signal(false);
+  readonly editingBoardId = signal<number | null>(null);
+  readonly editingBoardName = signal('');
+
+  readonly boardNameDialogTitle = computed(() =>
+    this.editingBoardId() == null ? 'New board' : 'Rename board',
+  );
+
+  readonly boardNameDialogConfirmLabel = computed(() =>
+    this.editingBoardId() == null ? 'Create' : 'Save',
+  );
+
   ngOnInit() {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    const id = Number(idParam);
-
-    if (isNaN(id)) return;
-
-    this.projectId = id;
-    this.projectsStore.selectedId.set(id);
-    void this.projectsStore.refresh();
-    void this.boardsStore.load(id);
+    this.route.paramMap.subscribe(params => {
+      const id = Number(params.get('id'));
+      this.projectId = id;
+      this.boardsStore.load(id);
+      this.projectsStore.selectedId.set(id);
+    });
   }
 
-  createBoard() {
-    const name = prompt('Board name?');
-    if (name?.trim()) this.boardsStore.create(this.projectId, name.trim());
+  openBoard(board: Board) {
+    this.router.navigate(['/project', this.projectId, 'board', board.id]);
   }
 
-  renameBoard(id: number, current: string) {
-    const name = prompt('New name:', current);
-    if (name && name !== current)
-      this.boardsStore.rename(id, name, this.projectId);
+  openCreateBoardDialog() {
+    this.editingBoardId.set(null);
+    this.editingBoardName.set('');
+    this.isBoardNameDialogOpen.set(true);
   }
 
-  openBoard(id: number) {
-    this.router.navigate(['/project', this.projectId, 'board', id]);
+  openRenameBoardDialog(id: number, currentName: string) {
+    this.editingBoardId.set(id);
+    this.editingBoardName.set(currentName);
+    this.isBoardNameDialogOpen.set(true);
+  }
+
+  async handleBoardNameConfirmed(name: string) {
+    const id = this.editingBoardId();
+    if (id == null) {
+      await this.boardsStore.create(this.projectId, name);
+    } else {
+      await this.boardsStore.rename(id, name, this.projectId);
+    }
+
+    this.isBoardNameDialogOpen.set(false);
+    this.editingBoardId.set(null);
+    this.editingBoardName.set('');
+  }
+
+  cancelBoardNameDialog() {
+    this.isBoardNameDialogOpen.set(false);
+    this.editingBoardId.set(null);
+    this.editingBoardName.set('');
   }
 
   openDeleteBoardDialog(board: Board) {

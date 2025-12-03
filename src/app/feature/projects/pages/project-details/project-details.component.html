@@ -8,8 +8,11 @@
   <h1 class="text-2xl font-bold">
     {{ projectsStore.selected()?.name || 'Project' }}
   </h1>
-
-  <button class="btn btn-primary" (click)="createBoard()">
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="openCreateBoardDialog()"
+  >
     New board
   </button>
 </div>
@@ -30,12 +33,21 @@
 <ul class="menu bg-base-200 rounded-box">
   @for (b of boardsStore.boards(); track b.id) {
     <li class="flex items-center">
-      <a (click)="openBoard(b.id)">
+      <a
+        class="flex-1"
+        (click)="openBoard(b)"
+      >
         {{ b.name }}
       </a>
 
       <div class="ml-auto flex gap-2">
-        <button class="btn btn-xs" (click)="renameBoard(b.id, b.name)">Rename</button>
+        <button
+          type="button"
+          class="btn btn-xs"
+          (click)="openRenameBoardDialog(b.id, b.name)"
+        >
+          Rename
+        </button>
         <button
           type="button"
           class="btn btn-xs btn-error"
@@ -64,3 +76,14 @@
   (confirmed)="confirmDeleteBoard()"
   (cancelled)="cancelDeleteBoard()"
 ></app-confirm-dialog>
+
+<app-name-dialog
+  [open]="isBoardNameDialogOpen()"
+  [title]="boardNameDialogTitle()"
+  label="Board name"
+  [name]="editingBoardName()"
+  [confirmLabel]="boardNameDialogConfirmLabel()"
+  cancelLabel="Cancel"
+  (confirmed)="handleBoardNameConfirmed($event)"
+  (cancelled)="cancelBoardNameDialog()"
+></app-name-dialog>

@@ -1,7 +1,11 @@
 <div class="flex items-center justify-between mb-4">
   <h1 class="text-2xl font-bold">Projects</h1>
-  <button class="btn btn-primary"
-          (click)="create()">New project
+  <button
+    class="btn btn-primary"
+    type="button"
+    (click)="openCreateProjectDialog()"
+  >
+    New project
   </button>
 </div>
 
@@ -10,16 +14,18 @@
     <li class="flex items-center">
       <a
         (click)="select(p.id)"
-        [routerLink]="['/project', p.id]"
-        routerLinkActive="active"
+        [class.active]="store.selected()?.id === p.id"
       >
         {{ p.name }}
       </a>
       <div class="ml-auto flex gap-2">
-        <button class="btn btn-xs"
-                (click)="rename(p.id, p.name)">Rename
+        <button
+          class="btn btn-xs"
+          type="button"
+          (click)="openRenameProjectDialog(p.id, p.name)"
+        >
+          Rename
         </button>
-
         <button
           class="btn btn-xs btn-error"
           type="button"
@@ -27,7 +33,6 @@
         >
           Delete
         </button>
-
       </div>
     </li>
   }
@@ -44,3 +49,13 @@
   (cancelled)="cancelDeleteProject()"
 ></app-confirm-dialog>
 
+<app-name-dialog
+  [open]="isProjectNameDialogOpen()"
+  [title]="projectNameDialogTitle()"
+  label="Project name"
+  [name]="editingProjectName()"
+  [confirmLabel]="projectNameDialogConfirmLabel()"
+  cancelLabel="Cancel"
+  (confirmed)="handleProjectNameConfirmed($event)"
+  (cancelled)="cancelProjectNameDialog()"
+></app-name-dialog>

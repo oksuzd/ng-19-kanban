@@ -1,0 +1,43 @@
+@if (open()) {
+  <div class="modal modal-open">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">
+        {{ title() || 'Edit name' }}
+      </h3>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">
+              {{ label() }}
+            </span>
+          </label>
+
+          <input
+            type="text"
+            class="input input-bordered w-full"
+            formControlName="name"
+            [class.input-error]="form.controls.name.invalid && form.controls.name.touched"
+          />
+
+          @if (form.controls.name.invalid && form.controls.name.touched) {
+            <p class="text-xs text-error mt-1">Name is required</p>
+          }
+        </div>
+
+        <div class="modal-action">
+          <button type="button" class="btn btn-ghost" (click)="onCancel()">
+            {{ cancelLabel() }}
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="form.invalid"
+          >
+            {{ confirmLabel() }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -1,17 +1,21 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import {ProjectsStore} from '../../../../state/projects.store';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { ProjectsStore } from '../../../../state/projects.store';
+import { Router } from '@angular/router';
 import {
   ConfirmDialogComponent
 } from '../../../../shared/ui/confirm-dialog/confirm-dialog.component';
+import {
+  NameDialogComponent
+} from '../../../../shared/ui/name-dialog/name-dialog.component';
 
 @Component({
   selector: 'app-projects-list',
-  imports: [RouterLink, RouterLinkActive, ConfirmDialogComponent],
+  imports: [ConfirmDialogComponent, NameDialogComponent],
   templateUrl: './projects-list.component.html',
   styleUrl: './projects-list.component.css',
 })
 export class ProjectsListComponent implements OnInit {
+  private readonly router = inject(Router);
   readonly store = inject(ProjectsStore);
 
   readonly isDeleteProjectDialogOpen = signal(false);
@@ -23,22 +27,56 @@ export class ProjectsListComponent implements OnInit {
     return name ? `Delete project "${name}"?` : 'Delete this project?';
   });
 
+  readonly isProjectNameDialogOpen = signal(false);
+  readonly editingProjectId = signal<number | null>(null);
+  readonly editingProjectName = signal('');
+
+  readonly projectNameDialogTitle = computed(() =>
+    this.editingProjectId() == null ? 'New project' : 'Rename project',
+  );
+
+  readonly projectNameDialogConfirmLabel = computed(() =>
+    this.editingProjectId() == null ? 'Create' : 'Save',
+  );
+
   ngOnInit() {
     void this.store.refresh();
   }
 
-  async create() {
-    const name = prompt('Project name?');
-    if (name?.trim()) await this.store.create(name.trim());
-  }
-
-  async rename(id: number, current: string) {
-    const name = prompt('New name:', current?.trim() ?? '');
-    if (name && name !== current) await this.store.rename(id, name.trim());
-  }
-
   select(id: number) {
     this.store.selectedId.set(id);
+    void this.router.navigate(['/project', id]);
+  }
+
+  openCreateProjectDialog() {
+    this.editingProjectId.set(null);
+    this.editingProjectName.set('');
+    this.isProjectNameDialogOpen.set(true);
+  }
+
+  openRenameProjectDialog(id: number, currentName: string) {
+    this.editingProjectId.set(id);
+    this.editingProjectName.set(currentName);
+    this.isProjectNameDialogOpen.set(true);
+  }
+
+  async handleProjectNameConfirmed(name: string) {
+    const id = this.editingProjectId();
+    if (id == null) {
+      await this.store.create(name);
+    } else {
+      await this.store.rename(id, name);
+    }
+
+    this.isProjectNameDialogOpen.set(false);
+    this.editingProjectId.set(null);
+    this.editingProjectName.set('');
+  }
+
+  cancelProjectNameDialog() {
+    this.isProjectNameDialogOpen.set(false);
+    this.editingProjectId.set(null);
+    this.editingProjectName.set('');
   }
 
   openDeleteProjectDialog(id: number, name: string) {
